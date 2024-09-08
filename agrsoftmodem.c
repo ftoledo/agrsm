@@ -190,7 +190,7 @@ int __init modem_init_module (void)
   ret = wrap_linux_modem_init ();
   if (!ret) {
 	  printk("<1>Loading module %s version %s (%s)\n", modem_name, modem_version, modem_revdate);
-	  add_taint(TAINT_PROPRIETARY_MODULE);
+	  add_taint(TAINT_PROPRIETARY_MODULE,LOCKDEP_NOW_UNRELIABLE);
   }
   else
 	  printk("<1>Could not detect Agere soft modem device\n Agere soft modem driver not loaded\n");
@@ -220,8 +220,8 @@ fnatr void x_vfree (void *ptr) { vfree (ptr); }
 fnatr void *x_kmalloc (unsigned int size) { return kmalloc (size, GFP_KERNEL | GFP_DMA); }
 fnatr void x_kfree (void *ptr) { kfree (ptr); }
 
-fnatr unsigned x_virt_to_bus (void *virt_addr) { return virt_to_bus (virt_addr); }
-fnatr void *x_ioremap_nocache (unsigned int phys_addr, unsigned size) { return ioremap_nocache (phys_addr, size); }
+fnatr unsigned x_virt_to_bus (void *virt_addr) { return virt_to_phys(virt_addr); }
+fnatr void *x_ioremap_nocache (unsigned int phys_addr, unsigned size) { return ioremap (phys_addr, size); }
 fnatr void x_iounmap (void *virt_addr) { iounmap (virt_addr); }
 	
 /************************* I/O Functions ***************************/
@@ -402,22 +402,22 @@ fnatr unsigned int agr_pci_get_irq ( unsigned int vendor, unsigned int device, u
 }
 	
 fnatr int x_pcibios_read_config_byte (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned char *val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_byte(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_byte(dev, where, val));}
             
 fnatr int x_pcibios_read_config_word (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned short *val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_word(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_word(dev, where, val));}
 
 fnatr int x_pcibios_read_config_dword (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned int *val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_dword(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_read_config_dword(dev, where, val));}
 
 fnatr int x_pcibios_write_config_byte (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned char val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_byte(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_byte(dev, where, val));}
 
 fnatr int x_pcibios_write_config_word (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned short val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_word(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_word(dev, where, val));}
 
 fnatr int x_pcibios_write_config_dword (unsigned char bus, unsigned char dev_fn, unsigned char where, unsigned int val)
-{struct pci_dev *dev = pci_get_bus_and_slot(bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_dword(dev, where, val));}
+{struct pci_dev *dev = pci_get_domain_bus_and_slot(0, bus, dev_fn); return ((!dev)? PCIBIOS_DEVICE_NOT_FOUND : pci_write_config_dword(dev, where, val));}
 
 #ifndef LT_KER_26
 int x_pcibios_find_class (unsigned int class_code, unsigned short index, unsigned char *bus, unsigned char *dev_fn)
